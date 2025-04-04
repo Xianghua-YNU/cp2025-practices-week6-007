@@ -8,10 +8,8 @@ def setup_parameters():
     返回:
     tuple: 包含激光波长(lambda_light,单位m)、透镜曲率半径(R_lens,单位m)的元组
     """
-    # 氦氖激光波长 (m)
-    lambda_light = 632.8e-9
-    # 透镜曲率半径 (m)
-    R_lens = 0.1
+    lambda_light = 632.8e-9  # 氦氖激光波长 (m)
+    R_lens = 0.1             # 透镜曲率半径 (m)
     return lambda_light, R_lens
 
 def generate_grid():
@@ -21,8 +19,12 @@ def generate_grid():
     返回:
     tuple: 包含网格坐标X、Y以及径向距离r的元组
     """
-    # 在此生成x和y方向的坐标网格
-    pass
+    # 调整范围至±1mm，确保r的最大值远小于R_lens
+    x = np.linspace(-0.001, 0.001, 1000)
+    y = np.linspace(-0.001, 0.001, 1000)
+    X, Y = np.meshgrid(x, y)
+    r = np.sqrt(X**2 + Y**2)
+    return X, Y, r
 
 def calculate_intensity(r, lambda_light, R_lens):
     """
@@ -36,8 +38,11 @@ def calculate_intensity(r, lambda_light, R_lens):
     返回:
     np.ndarray: 干涉强度分布数组
     """
-    # 在此实现光强计算
-    pass
+    # 直接计算薄膜厚度d（由于r远小于R_lens，无需处理虚数）
+    d = R_lens - np.sqrt(R_lens**2 - r**2)
+    # 计算光强（公式与实验原理一致）
+    intensity = 4 * (np.sin(2 * np.pi * d / lambda_light))**2
+    return intensity
 
 def plot_newton_rings(intensity):
     """
@@ -46,18 +51,23 @@ def plot_newton_rings(intensity):
     参数:
     intensity (np.ndarray): 干涉强度分布数组
     """
-    # 在此实现图像绘制
-    pass
+    plt.figure(figsize=(10, 10))
+    plt.imshow(
+        intensity, 
+        cmap='gray', 
+        extent=(-0.001, 0.001, -0.001, 0.001),  # 调整显示范围
+        vmin=0,                                  # 设置颜色范围下限
+        vmax=4,                                 # 设置颜色范围上限
+        origin='lower'
+    )
+    plt.colorbar(label='Intensity')
+    plt.title("Newton's Rings (Analytical Solution)")
+    plt.xlabel("x (m)")
+    plt.ylabel("y (m)")
+    plt.show()
 
 if __name__ == "__main__":
-    # 1. 设置参数
     lambda_light, R_lens = setup_parameters()
-    
-    # 2. 生成网格坐标
     X, Y, r = generate_grid()
-    
-    # 3. 计算干涉强度分布
     intensity = calculate_intensity(r, lambda_light, R_lens)
-    
-    # 4. 绘制牛顿环
     plot_newton_rings(intensity)

@@ -17,9 +17,10 @@ def maxwell_distribution(v, vp):
     分布函数f(v)的值
     """
     # 在此实现麦克斯韦分布函数
-    pass
+    f_v_ = 4/np.sqrt(np.pi)*(v**2/vp**3)*np.e**(-(v**2)/(vp**2))    #计算麦克斯韦速率分布函数值
+    return f_v_
 
-def percentage_0_to_vp(vp):
+def percentage_0_to_vp(vp0):
     """
     计算速率在0到vp间隔内的分子数占总分子数的百分比
     
@@ -30,7 +31,8 @@ def percentage_0_to_vp(vp):
     百分比值
     """
     # 在此实现0到vp的积分计算
-    pass
+    percent,error = quad(maxwell_distribution,0,vp0,args=(vp))  #使用quad函数进行积分
+    return percent*100  #返回百分比值
 
 def percentage_0_to_3_3vp(vp):
     """
@@ -43,7 +45,7 @@ def percentage_0_to_3_3vp(vp):
     百分比值
     """
     # 在此实现0到3.3vp的积分计算
-    pass
+    return percentage_0_to_vp(3.3*vp) #在0到3.3vp区间积分
 
 def percentage_3e4_to_3e8(vp):
     """
@@ -56,7 +58,8 @@ def percentage_3e4_to_3e8(vp):
     百分比值
     """
     # 在此实现3×10^4到3×10^8的积分计算
-    pass
+    percent,error = quad(maxwell_distribution,3e4,3e8,args=(vp),epsabs=1e-100,epsrel=1e-100)
+    return percent
 
 def trapezoidal_rule(f, a, b, n):
     """
@@ -72,7 +75,12 @@ def trapezoidal_rule(f, a, b, n):
     积分近似值
     """
     # 在此实现梯形积分法则
-    pass
+    x = np.linspace(a,b,n)
+    sumf = 0
+    for i in x[1:-2]:
+        sumf += f(i,vp)
+    definite_integration = ((b-a)/(2*n))*(f(a,vp) + f(b,vp) + 2*sumf)
+    return definite_integration
 
 def compare_methods(task_name, quad_func, trap_func, vp, n_values=[10, 100, 1000]):
     """比较quad和梯形积分法的结果和性能"""
@@ -105,5 +113,3 @@ if __name__ == "__main__":
     
     print("\n=== quad方法与梯形积分法对比 ===")
     compare_methods("任务1: 0到vp", percentage_0_to_vp, percentage_0_to_vp_trap, vp)
-
-    
